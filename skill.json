@@ -1,0 +1,11 @@
+{
+  "name": "openclaw-genpark-deep-auditor",
+  "version": "1.0.0",
+  "description": "OpenClaw GenPark multi-hop agent trajectory auditor with cyclic loop detection, diversity scoring, and execution drift prevention.",
+  "tools": [
+    {
+      "name": "audit_trajectory",
+      "description": "Inspect multi-step agent actions for infinite loops and execution anomalies."
+    }
+  ]
+}
