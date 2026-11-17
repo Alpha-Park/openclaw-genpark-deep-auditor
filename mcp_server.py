@@ -11,6 +11,20 @@ def run_tool(name, args):
     else:
         raise ValueError(f"Unknown tool: {name}")
 
+from typing import Any, Dict, List, Optional
+
+try:
+    from mcp.server.fastmcp import FastMCP
+except ImportError as exc:
+    raise SystemExit("MCP requires the mcp package. Run: python -m pip install -r requirements.txt") from exc
+
+mcp = FastMCP('openclaw-genpark-deep-auditor')
+
+@mcp.tool()
+def audit_trajectory(trajectory: Optional[List[Dict[str, Any]]] = None) -> str:
+    """Audit an agent trajectory for loops and state anomalies."""
+    return json.dumps(run_tool('audit_trajectory', {'trajectory': trajectory if trajectory is not None else []}))
+
 def main():
     if "--test" in sys.argv:
         print("[TEST] Running OpenClaw Deep Auditor Self-Test...")
@@ -25,15 +39,7 @@ def main():
         print("[TEST] All tests passed successfully!")
         return
 
-    for line in sys.stdin:
-        if not line.strip(): continue
-        try:
-            req = json.loads(line)
-            res = run_tool(req.get("name"), req.get("arguments", {}))
-            print(json.dumps({"jsonrpc": "2.0", "id": req.get("id"), "result": res}))
-        except Exception as e:
-            print(json.dumps({"jsonrpc": "2.0", "id": None, "error": {"code": -32603, "message": str(e)}}))
-        sys.stdout.flush()
+    mcp.run(transport="stdio")
 
 if __name__ == "__main__":
     main()
